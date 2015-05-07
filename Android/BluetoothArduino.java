@@ -57,9 +57,11 @@ public class BluetoothArduino extends Thread {
               LogError("[#]Bluetooth is not activated!!");
             }
 
+	    LogMessage("Searching for device named: "+robotName);
             Set<BluetoothDevice> paired = mBlueAdapter.getBondedDevices();
             if (paired.size() > 0) {
                 for (BluetoothDevice d : paired) {
+		    LogMessage("Paired Device: "+d.getName());
                     if (d.getName().equals(robotName)) {
                         mBlueRobo = d;
                         robotFound = true;
@@ -69,10 +71,10 @@ public class BluetoothArduino extends Thread {
             }
             
             if (!robotFound)
-                LogError("\t\t[#]There is not robot paired!!");
+                LogError("\t\t[#]There is no device paired!!");
 
         }catch (Exception e){
-            LogError("\t\t[#]Erro creating Bluetooth! : " + e.getMessage());
+            LogError("\t\t[#]Error creating Bluetooth! : " + e.getMessage());
         }
 
     }
@@ -89,14 +91,21 @@ public class BluetoothArduino extends Thread {
         if(!robotFound)
             return false;
         try{
-            LogMessage("\t\tConncting to the robot...");
+            LogMessage("\t\tConncting to the device...1"+mBlueRobo.toString());
 
-            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-            mBlueSocket = mBlueRobo.createRfcommSocketToServiceRecord(uuid);
+	    // Standard uuid for serial board.
+            //UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+	    // One I made myself.
+            UUID uuid = UUID.fromString("0b0ccd80-f410-11e4-b61d-0002a5d5c51b");
+            LogMessage("\t\tConncting to the device...2");
+            mBlueSocket = mBlueRobo.createInsecureRfcommSocketToServiceRecord(uuid);
+            LogMessage("\t\tConncting to the device...3");
             mBlueSocket.connect();
+            LogMessage("\t\tConncting to the device...4");
             mOut = mBlueSocket.getOutputStream();
             mIn = mBlueSocket.getInputStream();
             connected = true;
+            LogMessage("\t\tConncting to the device...5");
             this.start();
             LogMessage("\t\t\t" + mBlueAdapter.getName());
             LogMessage("\t\tOk!!");
